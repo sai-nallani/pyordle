@@ -39,7 +39,11 @@ class WordleBrain:
                 try:
                     self.alphabet[self.alphabet.index(guessed_word[i])] = colored(guessed_word[i], 'green', )
                 except ValueError:
-                    pass
+                    try:
+                        self.alphabet[self.alphabet.index(colored(guessed_word[i], "yellow"))] = colored(
+                            guessed_word[i], 'green')
+                    except ValueError:
+                        pass
             elif code[i] == 'y':
                 colored_str += colored(guessed_word[i], 'yellow')
                 try:
@@ -54,7 +58,6 @@ class WordleBrain:
                     pass
 
         return colored_str
-
 
     def play_console(self):
         guesses = 0
