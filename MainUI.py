@@ -3,9 +3,10 @@ import tkinter as tk
 class Rectangles(tk.Canvas):
     def __init__(self):
         super().__init__()
-
-        self.create_rectangle(0,0,100,100,outline="black")
-        self.pack()
+        for i in range(0, 45*5, 45):
+        
+          self.create_rectangle(i,0,30,30,outline="black")
+          self.pack()
         
 class MainUI(tk.Tk):
     def __init__(self):
