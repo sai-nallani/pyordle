@@ -1,14 +1,18 @@
 from termcolor import colored
-from acceptable_words import words
+from valid_guesses import VALID_GUESSES
+from word_list import WORDS
+import time
 import os
 import random
 
+clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
 class WordleBrain:
     def __init__(self):
         # create random word
         os.system('color')
-        self.WORD = random.choice(words)
+        os.system('clear')
+        self.WORD = random.choice(WORDS)
         print(f"The length of the word is: {len(self.WORD)}")
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
 
@@ -85,8 +89,9 @@ class WordleBrain:
         word_guessed = False
         while not word_guessed:
             guess = input("Guess a five letter word: ").lower()
-            guesses += 1
-            if guess == self.WORD:
+            if guess not in VALID_GUESSES:
+              print("not acceptable word")
+            elif guess == self.WORD:
                 print(f"You Won. You got it in {guesses} guesses")
                 word_guessed = True
             elif len(guess) != 5:
@@ -96,3 +101,4 @@ class WordleBrain:
                 code = self.processGuess(guess)
                 print(self.decodeColors(code, guess))
                 print(''.join(self.alphabet))
+            guesses += 1

@@ -5,7 +5,7 @@ class Rectangles(tk.Canvas):
         super().__init__()
         for i in range(0, 45*5, 45):
         
-          self.create_rectangle(i,0,30,30,outline="black")
+          self.create_rectangle(40+i,40+i,100+i,100+it,outline="black")
           self.pack()
         
 class MainUI(tk.Tk):
