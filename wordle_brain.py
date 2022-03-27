@@ -10,15 +10,15 @@ clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 class WordleBrain:
     def __init__(self):
         # create random word
-        os.system('color')
-        os.system('cls')
+
         self.WORD = random.choice(WORDS)
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
+        self.guesses = 1
 
     # processes guess and sees if it is same as the word
     def processGuess(self, guessWord):
         clue = ""  # clue to see what letters are green, yellow, and red
-
+        self.guesses += 1
         for i in range(len(self.WORD)):
             # if letters match up, add green to clue
             if self.WORD[i] == guessWord[i]:
@@ -103,9 +103,7 @@ class WordleBrain:
                 word_guessed = True
             elif self.is_input_valid(guess):
                 print("Please enter a five letter word")
-                guesses -= 1
             else:
                 code = self.processGuess(guess)
                 print(self.decodeColors(code, guess))
                 print(''.join(self.alphabet))
-            guesses += 1

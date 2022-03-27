@@ -1,7 +1,6 @@
 import tkinter as tk
 from wordle_brain import WordleBrain
 
-wb = WordleBrain()
 
 
 class Rectangles(tk.Canvas):
@@ -43,7 +42,9 @@ def motion(event):
 class MainUI(tk.Tk):
     def __init__(self):
         super().__init__()
-
+        self.wb = WordleBrain()
+        self.PLAYING = True
+        self.PLAY_AGAIN = False
         self._row_index = 0
 
         self.guesses_arr = []
@@ -71,22 +72,58 @@ class MainUI(tk.Tk):
         tk.Label(message, text=error_message, ).pack()
         message.after(1000, lambda: message.destroy())
 
-    def process_input(self, _):
+    def game_over(self, user_won: bool):
+        pop_up_game_over = tk.Toplevel(self)
+        pop_up_game_over.geometry('300x300')
+        pop_up_game_over.title('Game Over!')
+        if user_won:
+            tk.Label(pop_up_game_over, text=f'Game over! You got the word in {self.wb.guesses} guesses!').pack()
+        else:
+            tk.Label(pop_up_game_over, text=f"You absolute dumbass loser. The word was {self.wb.WORD}").pack()
+
+        tk.Label(pop_up_game_over,
+                 text="y = play again. n = stop").pack()
+        play_again = tk.Entry(pop_up_game_over)
+        play_again.pack()
+
+        def play_again_thing(e=None):
+            yorn = play_again.get()
+            match yorn:
+                case 'y':
+                    # print('hehheheha')
+                    self.PLAY_AGAIN = True
+                    self.destroy()
+                case 'n':
+                    # print('nononono')
+                    self.PLAYING = False
+                    self.destroy()
+
+        pop_up_game_over.bind("<Return>", play_again_thing)
+
+        pass
+
+    def process_input(self, _=None):
         guess: str = self.word_input.get()
         self.word_input.delete(0, tk.END)
-        print(guess)
-        validity = wb.is_input_valid(guess)
-        print(wb.WORD)
+        # print(guess)
+        # print(self.wb.guesses)
+        validity = self.wb.is_input_valid(guess)
+        # print(self.wb.WORD)
 
         if validity == 1:
             self.guesses_arr.append([char for char in guess])
-            color_code = wb.processGuess(guess)
-            print(color_code)
+            color_code = self.wb.processGuess(guess)
+            # print(color_code)
             self.rectangles.update_rectangles(guess=guess, row_index=self._row_index, color_code=color_code)
             self._row_index += 1
+            if guess == self.wb.WORD:
+                self.game_over(True)
+
         else:
             match validity:
                 case 0:
                     self.pop_up("Guess not in word list")
                 case -1:
-                    self.pop_up(f"Guess not {len(wb.WORD)} letters")
+                    self.pop_up(f"Guess not {len(self.wb.WORD)} letters")
+        if self.wb.guesses > 6:
+            self.game_over(False)
