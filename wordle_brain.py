@@ -1,19 +1,18 @@
-from termcolor import colored
 from valid_guesses import VALID_GUESSES
 from word_list import WORDS
-import time
 import os
 import random
+from termcolor import colored
 
 clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+
 
 class WordleBrain:
     def __init__(self):
         # create random word
         os.system('color')
-        os.system('clear')
+        os.system('cls')
         self.WORD = random.choice(WORDS)
-        print(f"The length of the word is: {len(self.WORD)}")
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
 
     # processes guess and sees if it is same as the word
@@ -84,17 +83,25 @@ class WordleBrain:
 
         return colored_str
 
+    def is_input_valid(self, guess):
+        if len(guess) != len(self.WORD):
+            return -1
+        elif guess not in VALID_GUESSES:
+            return 0
+        return 1
+
     def play_console(self):
         guesses = 0
         word_guessed = False
+        print(f"The length of the word is: {len(self.WORD)}")
         while not word_guessed:
             guess = input("Guess a five letter word: ").lower()
-            if guess not in VALID_GUESSES:
-              print("not acceptable word")
+            if self.is_input_valid(guess):
+                print("not acceptable word")
             elif guess == self.WORD:
                 print(f"You Won. You got it in {guesses} guesses")
                 word_guessed = True
-            elif len(guess) != 5:
+            elif self.is_input_valid(guess):
                 print("Please enter a five letter word")
                 guesses -= 1
             else:
