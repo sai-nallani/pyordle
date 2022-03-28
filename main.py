@@ -10,5 +10,5 @@ def main():
             ui = MainUI()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

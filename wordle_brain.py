@@ -1,10 +1,14 @@
-from valid_guesses import VALID_GUESSES
-from word_list import WORDS
+from constants.acceptable_words import VALID_GUESSES
+from constants.word_list import WORDS
 import os
 import random
-from termcolor import colored
 
-clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+try:
+    from termcolor import colored
+except ModuleNotFoundError:
+    pass
+
+clearConsole = lambda: os.system("cls" if os.name in ("nt", "dos") else "clear")
 
 
 class WordleBrain:
@@ -13,6 +17,7 @@ class WordleBrain:
 
         self.WORD = random.choice(WORDS)
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
+        self.dict_alphabet = {i: 'w' for i in self.alphabet}
         self.guesses = 1
 
     # processes guess and sees if it is same as the word
@@ -35,49 +40,73 @@ class WordleBrain:
                         should_add_yellow = False
                 # add yellow or white to clue
                 if should_add_yellow:
-                    clue += 'y'
+                    clue += "y"
                 else:
-                    clue += 'w'
+                    clue += "w"
             # add white to clue
             else:
                 clue += "w"
 
         return clue
 
+    def updateAlphabet(self, guess, color_code):
+        guess_to_color={}
+        for i, char in enumerate(guess):
+            dict[char] = color_code[i]
+        
+        for char, color in enumerate(guess_to_color):
+            self.dict_alphabet[char] = color
+        pass
+    
     # return a colored string and make sure the current alphabet is updated with the clues
     def decodeColors(self, code, guessed_word):
-        colored_str = ''
+        colored_str = ""
 
         # iterate through the guessed word
         for i in range(len(guessed_word)):
             # if the letter is g
-            if code[i] == 'g':
+            if code[i] == "g":
                 # add g to the colored string clue
-                colored_str += colored(guessed_word[i], 'green', )
+                colored_str += colored(
+                    guessed_word[i],
+                    "green",
+                )
                 # try to update the alphabet
                 try:
                     # replace regular alphabet with green
-                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(guessed_word[i], 'green', )
+                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(
+                        guessed_word[i],
+                        "green",
+                    )
                 except ValueError:
                     # try to replace yellow with green
                     try:
-                        self.alphabet[self.alphabet.index(colored(guessed_word[i], "yellow"))] = colored(
-                            guessed_word[i], 'green')
+                        self.alphabet[
+                            self.alphabet.index(colored(guessed_word[i], "yellow"))
+                        ] = colored(guessed_word[i], "green")
                     except ValueError:
                         pass
             # if the letter is yellow
-            elif code[i] == 'y':
-                colored_str += colored(guessed_word[i], 'yellow')  # add yellow to clue string
+            elif code[i] == "y":
+                colored_str += colored(
+                    guessed_word[i], "yellow"
+                )  # add yellow to clue string
                 # update alphabet
                 try:
-                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(guessed_word[i], 'yellow', )
+                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(
+                        guessed_word[i],
+                        "yellow",
+                    )
                 except ValueError:
                     pass
             else:
                 colored_str += guessed_word[i]  # add the letter with no colors
                 # update alphabet
                 try:
-                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(guessed_word[i], 'red', )
+                    self.alphabet[self.alphabet.index(guessed_word[i])] = colored(
+                        guessed_word[i],
+                        "red",
+                    )
                 except ValueError:
                     pass
 
@@ -106,4 +135,4 @@ class WordleBrain:
             else:
                 code = self.processGuess(guess)
                 print(self.decodeColors(code, guess))
-                print(''.join(self.alphabet))
+                print("".join(self.alphabet))
