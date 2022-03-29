@@ -5,7 +5,7 @@ def main():
     # wb = WordleBrain()
     # wb.WORD = 'stalk'
     # wb.play_console()
-    ui = MainUI(debug=True, word='stalk')
+    ui = MainUI(debug=False, word='stalk')
     while ui.PLAYING:
         if ui.PLAY_AGAIN:
             ui = MainUI(debug=False, word='purer')
