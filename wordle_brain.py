@@ -18,7 +18,7 @@ class WordleBrain:
         self.WORD = random.choice(WORDS)
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
         self.dict_alphabet = {i: 'w' for i in self.alphabet}
-        self.guesses = 1
+        self.guesses = 0
 
     # processes guess and sees if it is same as the word
     def processGuess(self, guessWord):
@@ -33,29 +33,46 @@ class WordleBrain:
             elif guessWord[i] in self.WORD:
                 should_add_yellow = True
                 # check if another instance of the letter is found
-                for j in range(len(guessWord)):
-                    if j == i:
-                        continue
-                    if guessWord[j] == guessWord[i]:
-                        should_add_yellow = False
+                for j in range(i, len(guessWord)):
+                    if guessWord.count(guessWord[i]) > self.WORD.count(guessWord[i]):
+
+                        if j == i:
+                            continue
+                        if guessWord[j] == guessWord[i]:
+
+                            should_add_yellow = False
                 # add yellow or white to clue
                 if should_add_yellow:
                     clue += "y"
                 else:
-                    clue += "w"
+                    clue += "z"
             # add white to clue
             else:
-                clue += "w"
+                clue += "z"
 
         return clue
 
     def updateAlphabet(self, guess, color_code):
-        guess_to_color={}
-        for i, char in enumerate(guess):
-            dict[char] = color_code[i]
-        
-        for char, color in enumerate(guess_to_color):
-            self.dict_alphabet[char] = color
+        """
+        used "upgrade" mechanic!
+        upgrade mechanic is when the alphabet's color can only be upgraded, not downgraded.
+        for example: yellow can only go to green, green can't be changed after in the dict
+        :param guess: user guess
+        :param color_code: color code with g y or z
+        :return:
+        """
+        for i in range(len(guess)):
+            letter = guess[i]
+            color = color_code[i]
+            current_color = self.dict_alphabet[letter]
+            if current_color == 'g':
+                continue
+            elif current_color == 'y' and color == 'g':
+                self.dict_alphabet[letter] = color
+            else:
+                self.dict_alphabet[letter] = color
+
+
         pass
     
     # return a colored string and make sure the current alphabet is updated with the clues
@@ -120,17 +137,16 @@ class WordleBrain:
         return 1
 
     def play_console(self):
-        guesses = 0
         word_guessed = False
         print(f"The length of the word is: {len(self.WORD)}")
         while not word_guessed:
             guess = input("Guess a five letter word: ").lower()
-            if self.is_input_valid(guess):
+            if self.is_input_valid(guess) == 0:
                 print("not acceptable word")
             elif guess == self.WORD:
-                print(f"You Won. You got it in {guesses} guesses")
+                print(f"You Won. You got it in {self.guesses} guesses")
                 word_guessed = True
-            elif self.is_input_valid(guess):
+            elif self.is_input_valid(guess) == -1:
                 print("Please enter a five letter word")
             else:
                 code = self.processGuess(guess)

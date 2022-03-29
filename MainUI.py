@@ -1,5 +1,5 @@
-from ast import Pass
 import tkinter as tk
+from tkinter import ttk
 from wordle_brain import WordleBrain
 
 
@@ -7,51 +7,50 @@ class Alphabet(tk.Canvas):
     def __init__(self, master):
         super().__init__(master=master)
         self.configure(width=350, height=400)
-        print('initialized alphabet')
-        self.alphabet_squares = []
-        keyboard = ['qwertyuiop','asdfghjkl','zxcvbnm']
-        a=0
+        self.alphabet_squares = {}
+        keyboard = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
 
-        for i in range(0, 30*10,30):
-            row = []
-            print(i)
-            x1_cor = 20+i
-            x2_cor = 50+1
-            y1_cor = 100
-            y2_cor = 150
-            x = self.create_rectangle(x1_cor,y1_cor,x2_cor,y2_cor)
-            
-            self.create_text(((x1_cor+x2_cor)//2,(y1_cor+y2_cor)//2), text=keyboard[0][a])
-            a+=1
-            row.append(x)
-        self.alphabet_squares.append(row)
-        a=0
-        for i in range(0, 30*9,30):
-            row = []
-            x1_cor = 20+i
-            x2_cor = 50+1
-            y1_cor = 160
-            y2_cor = 210
-            x = self.create_rectangle(x1_cor,y1_cor,x2_cor,y2_cor)
-            
-            txt = self.create_text(((x1_cor+x2_cor)//2,(y1_cor+y2_cor)//2), text=keyboard[1][a])
-            a+=1
-            row.append(x)
-        self.alphabet_squares.append(row)
-        a=0
-        for i in range(0, 30*7,30):
-            row = []
-            x1_cor = 20+i
-            x2_cor = 50+1
-            y1_cor = 220
-            y2_cor = 270
-            x = self.create_rectangle(x1_cor,y1_cor,x2_cor,y2_cor)
-            
-            txt = self.create_text(((x1_cor+x2_cor)//2,(y1_cor+y2_cor)//2), text=keyboard[2][a])
-            a+=1
-            row.append(x)
-        self.alphabet_squares.append(row)
-        self.grid(column=1, row=2)
+        def create_squares(number_of_squares: int, keyboard_row_index: int, y1, y2):
+            """creates squares and alphabet on the right of wordle squares
+
+            :param number_of_squares: how many squares in a row to be constructed
+            :param keyboard_row_index: which keyboard row to use
+            :param y1: height coordinate
+            :param y2: height coordinate #2
+            :return: None
+            """
+            a = 0
+            for i in range(0, 30 * number_of_squares, 30):
+                key_of_keyboard = keyboard[keyboard_row_index][a]
+                x1_cor = 20 + i
+                x2_cor = 50 + i
+                x = self.create_rectangle(x1_cor, y1, x2_cor, y2)
+
+                z = self.create_text(((x1_cor + x2_cor) // 2, (y1 + y2) // 2), text=key_of_keyboard,
+                                     font=('Georgia 20'))
+                # print(x1_cor, x2_cor, self.coords(z))
+                self.alphabet_squares[key_of_keyboard] = x
+                a += 1
+
+        create_squares(10, 0, 100, 150)
+        create_squares(9, 1, 170, 220)
+        create_squares(7, 2, 240, 290)
+        self.grid(column=13, row=1, rowspan=3)
+
+
+
+    def update_squares(self, text_version_alphabet: dict):
+        for char, color in text_version_alphabet.items():
+            square_number: int = self.alphabet_squares[char]
+            match color:
+
+                case 'g':
+                    self.itemconfig(square_number, fill='#669bbc')
+                case 'y':
+                    self.itemconfig(square_number, fill='#fdf0d5')
+                case 'z':
+                    self.itemconfig(square_number, fill='#780000')
+
 
 class Rectangles(tk.Canvas):
     """initializes and updates the wordle boxes!
@@ -76,8 +75,8 @@ class Rectangles(tk.Canvas):
                 )
             self.rectangle_list.append(current_row)
 
-        self.grid(column=3, row=2)
-        
+        self.grid(column=1, row=1, rowspan=3, columnspan=11)
+
     def update_rectangles(self, guess: str, row_index: int, color_code: str):
         """Takes guess argument and changes rectangles in a row's text and colors;
 
@@ -87,6 +86,7 @@ class Rectangles(tk.Canvas):
             color_code (str): from processGuess in WordleBrain class and is a string consisting of 'g' for green,
             'w' for white, 'y' yellow
         """
+        print(color_code)
         for i, char in enumerate(guess):
             # calculation of where text should be
             rect_coords = self.coords(self.rectangle_list[row_index][i])
@@ -94,20 +94,17 @@ class Rectangles(tk.Canvas):
             y_coordinate_of_text = (rect_coords[1] + rect_coords[3]) // 2
 
             # create text and set fill color of rectangles
-            self.create_text((x_coordinate_of_text, y_coordinate_of_text), text=char)
-            for (
-                i,
-                char,
-            ) in enumerate(color_code):
-                match char:
-                    case "g":
-                        self.itemconfig(self.rectangle_list[row_index][i], fill="green")
-                    case "y":
-                        self.itemconfig(
-                            self.rectangle_list[row_index][i], fill="yellow"
-                        )
-                    case "w":
-                        self.itemconfig(self.rectangle_list[row_index][i], fill="white")
+            self.create_text((x_coordinate_of_text, y_coordinate_of_text), text=char, font=('Georgia 20'))
+        for (j, chare) in enumerate(color_code):
+            match chare:
+                case "g":
+                    self.itemconfig(self.rectangle_list[row_index][j], fill="#669bbc")
+                case "y":
+                    self.itemconfig(
+                        self.rectangle_list[row_index][j], fill="#fdf0d5"
+                    )
+                case "z":
+                    self.itemconfig(self.rectangle_list[row_index][j], fill="#780000")
 
 
 # debug tool to get coordinates on event
@@ -117,30 +114,39 @@ def motion(event):
 
 
 class MainUI(tk.Tk):
-    def __init__(self):
+    def __init__(self, debug=False, word=None):
         super().__init__()
         self.wb = WordleBrain()
         self.PLAYING = True
         self.PLAY_AGAIN = False
         self._row_index = 0  # can be replaced with self.wb.guesses-1
-
+        if debug:
+            self.wb.WORD=word
+            print(self.wb.WORD)
         # configure the root window
         self.title("PyWordle")
-        self.geometry("1000x600")
+        self.geometry("800x600")
         self.attributes("-fullscreen", False)
-        self.bind('<Button-1>', motion)
+        # self.bind('<Button-1>', motion)
 
+        label = ttk.Label(
+            self,
+            text='Red: letter not in word\nYellow: letter in word but wrong position\nBlue: letter in correct position',
+            font=("Helvetica", 14))
+        label.grid(column=13, row=4)
         # create wordle boxes
         self.rectangles = Rectangles(self)
         self.alphabet = Alphabet(self)
         # gather guess input
         self.word_input = tk.Entry(self)
+        self.word_input.config(width=4, font='Georgia 40')
+        self.word_input.focus_set()
         self.guess_submit = tk.Button(
             self, text="Submit guess", command=self.process_input
         )
         self.bind("<Return>", self.process_input)
-        self.word_input.grid(column=3, row=4)
-        self.guess_submit.grid(column=3, row=5)
+        self.word_input.grid(column=5, row=4)
+        self.guess_submit.grid(column=5, row=5)
 
         self.mainloop()
 
@@ -153,7 +159,7 @@ class MainUI(tk.Tk):
         message = tk.Toplevel(self)
         message.geometry("200x200")
         message.title("Invalid Input")
-        
+
         tk.Label(
             message,
             text=error_message,
@@ -188,38 +194,43 @@ class MainUI(tk.Tk):
         def _yes(e=None):
             self.PLAY_AGAIN = True
             self.destroy()
+
         def _no(e=None):
             self.PLAY_AGAIN = False
             self.destroy()
-            
-        yes = tk.Button(pop_up_game_over,text="Yes", command=_yes)
+
+        yes = tk.Button(pop_up_game_over, text="Yes", command=_yes)
         no = tk.Button(pop_up_game_over, text="No", command=_no)
-        yes.grid(column=2,row=4)
-        no.grid(column=2,row=5)
+        yes.grid(column=2, row=4)
+        no.grid(column=2, row=5)
 
     def process_input(self, _=None):
-        guess: str = self.word_input.get()
-        self.word_input.delete(0, tk.END)
-        # print(guess)
-        # print(self.wb.guesses)
-        validity = self.wb.is_input_valid(guess)
-        # print(self.wb.WORD)
+        guess: str = self.word_input.get().lower()
 
-        if validity == 1:
-            color_code = self.wb.processGuess(guess)
-            # print(color_code)
-            self.rectangles.update_rectangles(
-                guess=guess, row_index=self._row_index, color_code=color_code
-            )
-            self._row_index += 1
-            if guess == self.wb.WORD:
-                self.game_over(True)
+        if len(guess) > 0:
+            self.word_input.delete(0, tk.END)
+            # print(guess)
+            # print(self.wb.guesses)
+            validity = self.wb.is_input_valid(guess)
+            # print(self.wb.WORD)
 
-        else:
-            match validity:
-                case 0:
-                    self.pop_up("Guess not in word list")
-                case -1:
-                    self.pop_up(f"Guess not {len(self.wb.WORD)} letters")
-        if self.wb.guesses > 6:
-            self.game_over(False)
+            if validity == 1:
+                color_code = self.wb.processGuess(guess)
+                self.wb.updateAlphabet(guess, color_code)
+                # print(color_code)
+                self.rectangles.update_rectangles(
+                    guess=guess, row_index=self._row_index, color_code=color_code
+                )
+                self.alphabet.update_squares(self.wb.dict_alphabet)
+                self._row_index += 1
+                if guess == self.wb.WORD:
+                    self.game_over(True)
+
+            else:
+                match validity:
+                    case 0:
+                        self.pop_up("Guess not in word list")
+                    case -1:
+                        self.pop_up(f"Guess not {len(self.wb.WORD)} letters")
+            if self.wb.guesses > 6:
+                self.game_over(False)
