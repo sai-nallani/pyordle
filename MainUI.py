@@ -40,6 +40,7 @@ class Alphabet(tk.Canvas):
 
 
     def update_squares(self, text_version_alphabet: dict):
+        print(text_version_alphabet)
         for char, color in text_version_alphabet.items():
             square_number: int = self.alphabet_squares[char]
             match color:
@@ -48,7 +49,7 @@ class Alphabet(tk.Canvas):
                     self.itemconfig(square_number, fill='#669bbc')
                 case 'y':
                     self.itemconfig(square_number, fill='#fdf0d5')
-                case 'z':
+                case 'r':
                     self.itemconfig(square_number, fill='#780000')
 
 
@@ -103,7 +104,7 @@ class Rectangles(tk.Canvas):
                     self.itemconfig(
                         self.rectangle_list[row_index][j], fill="#fdf0d5"
                     )
-                case "z":
+                case "r":
                     self.itemconfig(self.rectangle_list[row_index][j], fill="#780000")
 
 
