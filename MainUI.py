@@ -40,7 +40,6 @@ class Alphabet(tk.Canvas):
 
 
     def update_squares(self, text_version_alphabet: dict):
-        print(text_version_alphabet)
         for char, color in text_version_alphabet.items():
             square_number: int = self.alphabet_squares[char]
             match color:
@@ -219,6 +218,7 @@ class MainUI(tk.Tk):
                 color_code = self.wb.processGuess(guess)
                 self.wb.updateAlphabet(guess, color_code)
                 # print(color_code)
+                print(self.wb.guesses)
                 self.rectangles.update_rectangles(
                     guess=guess, row_index=self._row_index, color_code=color_code
                 )
@@ -233,5 +233,5 @@ class MainUI(tk.Tk):
                         self.pop_up("Guess not in word list")
                     case -1:
                         self.pop_up(f"Guess not {len(self.wb.WORD)} letters")
-            if self.wb.guesses > 6:
+            if self.wb.guesses == 6:
                 self.game_over(False)

@@ -87,7 +87,6 @@ class WordleBrain:
             else:
                 self.dict_alphabet[letter] = color
 
-        print(self.dict_alphabet)
         pass
 
     # return a colored string and make sure the current alphabet is updated with the clues
