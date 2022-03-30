@@ -17,11 +17,26 @@ class WordleBrain:
 
         self.WORD = random.choice(WORDS)
         self.alphabet = list("abcdefghijklmnopqrstuvwxyz")
-        self.dict_alphabet = {i: 'w' for i in self.alphabet}
+        self.dict_alphabet = {i: "w" for i in self.alphabet}
         self.guesses = 0
 
     # processes guess and sees if it is same as the word
     def processGuess(self, guessWord):
+        wordArr = [
+            "*" if guessWord[i] == char else char for i, char in enumerate(self.WORD)
+        ]
+        clue = ""
+        self.guesses += 1
+        for gChar, wChar in zip(guessWord, wordArr):
+            if gChar == wChar or wChar == "*":
+                clue += "g"
+            elif gChar in wordArr:
+                clue += "y"
+            else:
+                clue += "r"
+        return clue
+
+    def _processGuess(self, guessWord):
         clue = ""  # clue to see what letters are green, yellow, and red
         self.guesses += 1
         for i in range(len(self.WORD)):
@@ -65,16 +80,16 @@ class WordleBrain:
             letter = guess[i]
             color = color_code[i]
             current_color = self.dict_alphabet[letter]
-            if current_color == 'g':
+            if current_color == "g":
                 continue
-            elif current_color == 'y' and color == 'g':
+            elif current_color == "y" and color == "g":
                 self.dict_alphabet[letter] = color
             else:
                 self.dict_alphabet[letter] = color
 
-
+        print(self.dict_alphabet)
         pass
-    
+
     # return a colored string and make sure the current alphabet is updated with the clues
     def decodeColors(self, code, guessed_word):
         colored_str = ""
